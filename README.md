@@ -9,6 +9,7 @@ Una simulación de selección natural inspirada en el video ["Simulating Natural
 - **Mutaciones**: Aparición aleatoria de blobs con mayor velocidad
 - **Selección natural**: Supervivencia y reproducción basada en la aptitud
 - **Ciclo día/noche**: Los blobs regresan a su hogar al final de cada día
+- **Agente SPADE**: Gestor de simulación implementado como agente multiagente
 - **GUI interactiva**: Visualización en tiempo real con controles de velocidad
 - **Estadísticas**: Seguimiento de población, mutaciones y velocidad promedio
 
@@ -17,7 +18,18 @@ Una simulación de selección natural inspirada en el video ["Simulating Natural
 ### Requisitos
 - Python 3.8+
 - tkinter (incluido en la mayoría de instalaciones de Python)
+- SPADE (Sistema de Agentes Multiagente)
+- asyncio (incluido en Python 3.7+)
 - En sistemas Linux: `sudo apt-get install python3-tk`
+
+### Instalación de dependencias
+```bash
+# Opción 1: Instalar desde requirements.txt
+pip install -r requirements.txt
+
+# Opción 2: Instalar manualmente
+pip install spade
+```
 
 ### Uso
 
@@ -28,12 +40,17 @@ Una simulación de selección natural inspirada en el video ["Simulating Natural
    history = manager.run(days=10)
    ```
 
-2. **Simulación con GUI**:
+2. **Simulación con GUI y Agente SPADE**:
    ```python
-   # Ejecutar la última celda del notebook
+   # Ejecutar las últimas celdas del notebook
    manager_gui = SimulationManagerWithGUI()
    gui = SimulationGUI(manager_gui)
+   agent = SimulationAgent("test@localhost", "1234", manager_gui)
+   
+   # Iniciar agente y GUI
+   await agent.start(auto_register=False)
    gui.run()
+   await agent.stop()
    ```
 
 ## 🎮 Controles de la GUI
@@ -77,10 +94,37 @@ MUTATION_PROBABILITY = 0.2  # Probabilidad de mutación (20%)
    - Selección natural y reproducción
    - Generación de comida
 
-4. **`SimulationGUI`**: Interfaz gráfica
+4. **`SimulationAgent`**: Agente SPADE que gestiona la simulación
+   - Hereda de la clase Agent de SPADE
+   - Implementa comportamiento cíclico para actualizar la simulación
+   - Maneja la lógica de pasos de simulación de forma asíncrona
+
+5. **`SimulationGUI`**: Interfaz gráfica
    - Visualización en tiempo real
    - Controles de usuario
    - Estadísticas en pantalla
+
+## 🤖 Arquitectura de Agentes
+
+El proyecto utiliza el framework **SPADE** (Smart Python Agent Development Environment) para implementar un verdadero sistema multiagente:
+
+### SimulationAgent
+- **Tipo**: Agente principal que gestiona la simulación
+- **Comportamiento**: CyclicBehaviour que ejecuta pasos de simulación continuamente
+- **Comunicación**: Preparado para futuras extensiones con comunicación entre agentes
+- **Gestión asíncrona**: Maneja la concurrencia entre la simulación y la GUI
+
+### Arquitectura sin servidor XMPP
+Para simplificar la ejecución en entornos educativos, el proyecto incluye un parche que permite ejecutar agentes SPADE sin requerir un servidor XMPP externo:
+
+```python
+async def _no_connect(self, *args, **kwargs):
+    return
+
+Agent._async_connect = _no_connect
+```
+
+Esto permite que los agentes funcionen localmente sin configuración adicional de infraestructura.
 
 ## 📈 Evolución Observable
 
@@ -96,18 +140,22 @@ A lo largo de la simulación puedes observar:
 Este proyecto fue desarrollado para la **Tercera Práctica Calificada** del curso **Tópicos en Ciencias de Computación**. Implementa conceptos de:
 
 - Simulación multiagente
+- Framework SPADE para agentes
 - Algoritmos evolutivos
 - Sistemas complejos
+- Programación asíncrona con asyncio
 - Interfaces gráficas de usuario
 - Programación orientada a objetos
 
 ## 🤖 Declaración de IA
 
 Durante el desarrollo se utilizó **GitHub Copilot** como asistente de programación para:
+- Integración del framework SPADE para agentes multiagente
+- Implementación de programación asíncrona con asyncio
 - Optimización de la interfaz gráfica
 - Mejoras en el sistema de colores y visualización
 - Refinamiento de la documentación
-- Resolución de problemas técnicos con tkinter
+- Resolución de problemas técnicos con tkinter y SPADE
 
 ## 📝 Licencia
 
